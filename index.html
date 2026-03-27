@@ -16,18 +16,12 @@
 }
 html,body{min-height:100vh;background:#e8e2d4;}
 body{font-family:'Noto Serif KR',serif;color:var(--ink);}
+#game{max-width:700px;margin:0 auto;padding:20px 16px 48px;}
 
-#game{
-  max-width:700px;margin:0 auto;
-  padding:20px 16px 48px;
-}
-
-/* ── 헤더 ── */
 .hdr{border-top:4px solid var(--border);border-bottom:2px solid var(--border);text-align:center;padding:10px 0 7px;margin-bottom:5px;background:var(--paper);}
 .hdr-title{font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:7px;color:var(--border);}
 .hdr-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:5px 4px 11px;border-bottom:1px solid var(--border);margin-bottom:16px;letter-spacing:1px;background:var(--paper);}
 
-/* ── 닉네임 화면 ── */
 #screen-nick{background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:32px 24px;text-align:center;}
 .nick-logo{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:4px;color:var(--border);margin-bottom:6px;}
 .nick-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.8;}
@@ -39,7 +33,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
 .nick-warn{font-size:12px;color:var(--fail);min-height:18px;margin-bottom:20px;}
 .rank-section-title{font-family:'Black Han Sans',sans-serif;font-size:12px;color:var(--muted);letter-spacing:2px;margin-bottom:8px;}
 
-/* ── 게임 화면 ── */
 #screen-game{display:none;}
 .prog-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .prog-label{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:1px;}
@@ -48,13 +41,11 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
 .score-badge{font-family:'Black Han Sans',sans-serif;font-size:13px;color:var(--accent);white-space:nowrap;}
 .player-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:1px;}
 
-/* ── 타이머 ── */
 .timer-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .timer-track{flex:1;height:10px;background:var(--paper2);border:0.5px solid var(--border);border-radius:5px;overflow:hidden;}
 .timer-fill{height:100%;border-radius:5px;transition:width 0.1s linear,background 0.3s;}
 .timer-num{font-family:'Black Han Sans',sans-serif;font-size:15px;min-width:36px;text-align:right;}
 
-/* ── 카드 ── */
 .mcard{background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:18px 22px;position:relative;margin-bottom:12px;}
 .mstamp{position:absolute;top:12px;right:16px;font-family:'Black Han Sans',sans-serif;font-size:10px;color:var(--accent);border:1.5px solid var(--accent);padding:2px 7px;letter-spacing:1px;transform:rotate(8deg);opacity:.85;}
 .mnum{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px;}
@@ -97,7 +88,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
 .pts-pop.show{animation:popUp .9s forwards;}
 @keyframes popUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-36px);}}
 
-/* ── 결과 화면 ── */
 #screen-result{display:none;text-align:center;padding:16px 0;}
 .res-title{font-family:'Black Han Sans',sans-serif;font-size:30px;color:var(--border);letter-spacing:4px;margin-bottom:4px;}
 .res-rank{font-size:20px;color:var(--accent);font-weight:700;margin-bottom:12px;}
@@ -105,7 +95,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
 .res-score-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
 .res-box{margin:0 auto 14px;max-width:500px;text-align:left;font-size:13px;color:var(--muted);line-height:2;background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:16px 20px;}
 
-/* ── 순위표 ── */
 .rank-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
 .rank-table th{font-family:'Black Han Sans',sans-serif;font-size:11px;letter-spacing:1px;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--border);text-align:left;}
 .rank-table td{padding:8px;border-bottom:0.5px solid var(--paper2);vertical-align:middle;}
@@ -115,6 +104,7 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
 .rs{font-family:'Black Han Sans',sans-serif;font-size:14px;color:var(--accent);text-align:right;}
 .rk{font-weight:700;color:var(--ink);}
 .rank-empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 0;}
+.rank-loading{text-align:center;color:var(--muted);font-size:12px;padding:16px 0;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -127,7 +117,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
     <span id="meta-issue"></span>
   </div>
 
-  <!-- 닉네임 입력 -->
   <div id="screen-nick">
     <div class="nick-logo">기자단 입장</div>
     <div class="nick-sub">닉네임을 입력하고 취재를 시작하세요!<br>같은 닉네임은 높은 점수 기록만 남아요.</div>
@@ -140,7 +129,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
     <div id="rank-preview"></div>
   </div>
 
-  <!-- 게임 -->
   <div id="screen-game">
     <div class="prog-row">
       <span class="prog-label" id="prog-label">미션 1 / 12</span>
@@ -152,10 +140,10 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
       <span id="sec-disp"></span>
     </div>
     <div class="timer-row">
-      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%;background:rgb(0,180,60);"></div></div>
+      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%;background:rgb(0,180,50);"></div></div>
       <span class="timer-num" id="timer-num">45</span>
     </div>
-    <div class="mcard" id="mcard" style="position:relative;">
+    <div class="mcard" style="position:relative;">
       <div class="mstamp" id="mstamp"></div>
       <div class="mnum" id="mnum"></div>
       <div class="ttag" id="mthink"></div>
@@ -173,7 +161,6 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
     </div>
   </div>
 
-  <!-- 결과 -->
   <div id="screen-result">
     <div class="res-title">취재 완료!</div>
     <div class="res-rank" id="res-rank"></div>
@@ -188,9 +175,27 @@ body{font-family:'Noto Serif KR',serif;color:var(--ink);}
     </div>
   </div>
 
-</div><!-- #game -->
+</div>
 
-<script>
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, onValue }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+/* ================================================================
+   ★ Firebase 설정 — 아래 값을 본인 프로젝트 값으로 교체하세요 ★
+================================================================ */
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+
 /* ================================================================
    ★ 다음 호 교체 구역 ★
    ISSUE_KEY 값을 바꾸면 순위 자동 리셋 (예: "v3호")
@@ -318,16 +323,19 @@ const QS = [
 ];
 /* ================================================================ */
 
-const TOTAL      = QS.length;
-const MAX_PER_Q  = 20;
-const MAX_SCORE  = TOTAL * MAX_PER_Q;
-const STORAGE_KEY = `ssd_rank_${ISSUE_KEY}`;
+const TOTAL     = QS.length;
+const MAX_PER_Q = 20;
+const MAX_SCORE = TOTAL * MAX_PER_Q;
+const DB_PATH   = `ranks/${ISSUE_KEY}`;
+
+const secLabel = {상상:"상상제보",진실:"진실취재",리터러시:"리터러시",심화:"심화조사",종합:"종합판단"};
+const secColor  = {상상:"#b8860b",진실:"#185fa5",리터러시:"#185fa5",심화:"#533ab7",종합:"#5a4a30"};
 
 let nickname="", cur=0, score=0, hintUsed=[], answered=[], results=[];
 let timerInterval=null, timeLeft=0, qStartTime=0;
 
-const secLabel = {상상:"상상제보",진실:"진실취재",리터러시:"리터러시",심화:"심화조사",종합:"종합판단"};
-const secColor  = {상상:"#b8860b",진실:"#185fa5",리터러시:"#185fa5",심화:"#533ab7",종합:"#5a4a30"};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
 
 document.getElementById('meta-date').textContent  = DATE;
 document.getElementById('meta-issue').textContent = ISSUE;
@@ -340,20 +348,30 @@ function calcPts(limitSec, elapsedSec, hinted) {
   return hinted ? Math.round(base / 2) : base;
 }
 
-/* ── localStorage 순위 ── */
-function getRanks() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch(e) { return []; }
+/* ── Firebase 순위 ── */
+async function getRanks() {
+  try {
+    const snap = await get(ref(db, DB_PATH));
+    if (!snap.exists()) return [];
+    return Object.values(snap.val()).sort((a,b) => b.score - a.score);
+  } catch(e) { return []; }
 }
-function saveRank(nick, sc) {
-  let ranks = getRanks();
-  const idx = ranks.findIndex(r => r.nick === nick);
-  if (idx >= 0) { if (sc > ranks[idx].score) ranks[idx].score = sc; }
-  else ranks.push({nick, score: sc});
-  ranks.sort((a,b) => b.score - a.score);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(ranks)); } catch(e){}
-  return ranks;
+async function saveRank(nick, sc) {
+  try {
+    const snap = await get(ref(db, `${DB_PATH}/${nick}`));
+    const prev = snap.exists() ? snap.val().score : -1;
+    if (sc > prev) await set(ref(db, `${DB_PATH}/${nick}`), {nick, score: sc});
+  } catch(e) {}
+  return await getRanks();
 }
+
+/* 실시간 순위 (닉네임 화면) */
+onValue(ref(db, DB_PATH), snap => {
+  const data = snap.exists()
+    ? Object.values(snap.val()).sort((a,b) => b.score - a.score)
+    : [];
+  document.getElementById('rank-preview').innerHTML = buildTable(data, '');
+});
 
 function rnLabel(i) {
   if (i===0) return '<span class="rn g1">🥇</span>';
@@ -363,23 +381,19 @@ function rnLabel(i) {
 }
 function buildTable(ranks, myNick) {
   if (!ranks.length) return '<div class="rank-empty">아직 기록이 없어요. 첫 기자가 되어 보세요!</div>';
-  const top = ranks.slice(0, 10);
   let h = '<table class="rank-table"><thead><tr><th>순위</th><th>닉네임</th><th style="text-align:right">점수</th></tr></thead><tbody>';
-  top.forEach((r,i) => {
+  ranks.slice(0,10).forEach((r,i) => {
     const me = r.nick === myNick;
     h += `<tr class="${me?'rank-me':''}"><td>${rnLabel(i)}</td><td class="rk">${r.nick}${me?' ★':''}</td><td class="rs">${r.score}</td></tr>`;
   });
   return h + '</tbody></table>';
 }
-function renderPreview() {
-  document.getElementById('rank-preview').innerHTML = buildTable(getRanks(), '');
-}
 
 /* ── 닉네임 입장 ── */
-document.getElementById('nickInput').addEventListener('keydown', e => { if (e.key==='Enter') startGame(); });
-function startGame() {
+document.getElementById('nickInput').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
+window.startGame = () => {
   const val = document.getElementById('nickInput').value.trim();
-  if (!val) { document.getElementById('nickWarn').textContent = '닉네임을 입력해 주세요!'; return; }
+  if (!val) { document.getElementById('nickWarn').textContent='닉네임을 입력해 주세요!'; return; }
   nickname = val;
   document.getElementById('nickWarn').textContent = '';
   document.getElementById('screen-nick').style.display = 'none';
@@ -387,7 +401,7 @@ function startGame() {
   document.getElementById('player-label').textContent = `기자: ${nickname}`;
   cur=0; score=0; hintUsed=[]; answered=[]; results=[];
   render();
-}
+};
 
 /* ── 타이머 ── */
 function startTimer(sec) {
@@ -419,7 +433,7 @@ function onTimeout() {
   document.querySelectorAll('.opt-btn').forEach(b => b.disabled=true);
   const ca = Array.isArray(q.ans) ? q.ans : [q.ans];
   document.querySelectorAll('.opt-btn').forEach((btn,i) => {
-    if (ca.includes(i)) btn.className = 'opt-btn timeout-reveal';
+    if (ca.includes(i)) btn.className='opt-btn timeout-reveal';
   });
   const fb = document.getElementById('mfb');
   fb.className = 'fb show timeout';
@@ -432,11 +446,11 @@ function onTimeout() {
 function render() {
   const q = QS[cur];
   document.getElementById('prog-label').textContent = `미션 ${cur+1} / ${TOTAL}`;
-  document.getElementById('prog-fill').style.width = `${(cur/TOTAL)*100}%`;
+  document.getElementById('prog-fill').style.width  = `${(cur/TOTAL)*100}%`;
   document.getElementById('score-disp').textContent = `${score}점`;
-  document.getElementById('sec-disp').textContent = secLabel[q.sec];
-  document.getElementById('mstamp').textContent = q.stamp;
-  document.getElementById('mnum').textContent = `▪ 미션 ${String(cur+1).padStart(2,'0')} · ${secLabel[q.sec]}`;
+  document.getElementById('sec-disp').textContent   = secLabel[q.sec];
+  document.getElementById('mstamp').textContent     = q.stamp;
+  document.getElementById('mnum').textContent       = `▪ 미션 ${String(cur+1).padStart(2,'0')} · ${secLabel[q.sec]}`;
   const tt = document.getElementById('mthink');
   tt.textContent = q.think; tt.className = `ttag ttag-${q.sec}`;
   document.getElementById('mdeep').style.display = q.deep ? 'inline-block' : 'none';
@@ -460,7 +474,8 @@ function render() {
   hint.textContent = `힌트: ${q.hint}`;
   hint.className = 'mhint' + (hintUsed[cur] ? ' show' : '');
   document.getElementById('hintBtn').style.display = hintUsed[cur] ? 'none' : 'inline-block';
-  document.getElementById('mfb').className = 'fb'; document.getElementById('mfb').textContent = '';
+  document.getElementById('mfb').className = 'fb';
+  document.getElementById('mfb').textContent = '';
   document.getElementById('nextBtn').style.display = 'none';
   renderOpts(q);
   if (answered[cur] === undefined) startTimer(q.time);
@@ -499,9 +514,7 @@ function pick(i) {
     const pop = document.getElementById('ptsPop');
     pop.textContent = `+${pts}점!`;
     pop.style.color = pts>=20 ? 'var(--gold)' : pts>=15 ? 'var(--success)' : 'var(--accent)';
-    pop.className = 'pts-pop';
-    void pop.offsetWidth;
-    pop.className = 'pts-pop show';
+    pop.className = 'pts-pop'; void pop.offsetWidth; pop.className = 'pts-pop show';
   }
 
   const fb = document.getElementById('mfb');
@@ -513,15 +526,14 @@ function pick(i) {
   renderOpts(q);
 }
 
-function useHint() {
+window.useHint = () => {
   hintUsed[cur] = true;
   document.getElementById('mhint').className = 'mhint show';
   document.getElementById('hintBtn').style.display = 'none';
-}
+};
+window.nextQ = () => { cur++; if (cur>=TOTAL) showResult(); else render(); };
 
-function nextQ() { cur++; if (cur>=TOTAL) showResult(); else render(); }
-
-function showResult() {
+async function showResult() {
   stopTimer();
   document.getElementById('screen-game').style.display = 'none';
   document.getElementById('screen-result').style.display = 'block';
@@ -555,24 +567,22 @@ function showResult() {
   html += `<br><small style="color:var(--muted);">${msg}</small>`;
   document.getElementById('res-summary').innerHTML = html;
 
-  const ranks = saveRank(nickname, score);
+  document.getElementById('rank-final').innerHTML = '<div class="rank-loading">순위 업데이트 중…</div>';
+  const ranks = await saveRank(nickname, score);
   document.getElementById('rank-final').innerHTML = buildTable(ranks, nickname);
 }
 
-function goNick() {
+window.goNick = () => {
   document.getElementById('screen-result').style.display = 'none';
   document.getElementById('screen-nick').style.display = 'block';
-  renderPreview();
-}
-function restart() {
+};
+window.restart = () => {
   document.getElementById('screen-result').style.display = 'none';
   document.getElementById('screen-game').style.display = 'block';
   document.getElementById('player-label').textContent = `기자: ${nickname}`;
   cur=0; score=0; hintUsed=[]; answered=[]; results=[];
   render();
-}
-
-renderPreview();
+};
 </script>
 </body>
 </html>
