@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소요도서관 특보 — 기자단 취재 미션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1a1208;--paper:#f5f0e8;--paper2:#ede8dc;
+  --accent:#c8360a;--gold:#b8860b;--border:#2a1a08;
+  --muted:#5a4a30;--success:#1a5c1a;--fail:#8b1a1a;
+  --literacy:#185fa5;--deep:#533ab7;
+}
+html,body{min-height:100vh;background:#e8e2d4;}
+body{font-family:'Noto Serif KR',serif;color:var(--ink);}
+
+#game{
+  max-width:700px;margin:0 auto;
+  padding:20px 16px 48px;
+}
+
+/* ── 헤더 ── */
+.hdr{border-top:4px solid var(--border);border-bottom:2px solid var(--border);text-align:center;padding:10px 0 7px;margin-bottom:5px;background:var(--paper);}
+.hdr-title{font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:7px;color:var(--border);}
+.hdr-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:5px 4px 11px;border-bottom:1px solid var(--border);margin-bottom:16px;letter-spacing:1px;background:var(--paper);}
+
+/* ── 닉네임 화면 ── */
+#screen-nick{background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:32px 24px;text-align:center;}
+.nick-logo{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:4px;color:var(--border);margin-bottom:6px;}
+.nick-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.8;}
+.nick-input-wrap{display:flex;gap:8px;max-width:340px;margin:0 auto 8px;}
+.nick-input{flex:1;border:1.5px solid var(--border);background:var(--paper2);font-family:'Noto Serif KR',serif;font-size:16px;padding:10px 14px;border-radius:3px;color:var(--ink);outline:none;}
+.nick-input:focus{border-color:var(--gold);}
+.start-btn{background:var(--border);color:var(--paper);border:none;border-radius:3px;font-family:'Black Han Sans',sans-serif;font-size:14px;padding:10px 18px;cursor:pointer;letter-spacing:1px;white-space:nowrap;}
+.start-btn:hover{background:var(--accent);}
+.nick-warn{font-size:12px;color:var(--fail);min-height:18px;margin-bottom:20px;}
+.rank-section-title{font-family:'Black Han Sans',sans-serif;font-size:12px;color:var(--muted);letter-spacing:2px;margin-bottom:8px;}
+
+/* ── 게임 화면 ── */
+#screen-game{display:none;}
+.prog-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.prog-label{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:1px;}
+.prog-track{flex:1;height:7px;background:var(--paper2);border:0.5px solid var(--border);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:4px;transition:width 0.4s ease;}
+.score-badge{font-family:'Black Han Sans',sans-serif;font-size:13px;color:var(--accent);white-space:nowrap;}
+.player-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:1px;}
+
+/* ── 타이머 ── */
+.timer-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.timer-track{flex:1;height:10px;background:var(--paper2);border:0.5px solid var(--border);border-radius:5px;overflow:hidden;}
+.timer-fill{height:100%;border-radius:5px;transition:width 0.1s linear,background 0.3s;}
+.timer-num{font-family:'Black Han Sans',sans-serif;font-size:15px;min-width:36px;text-align:right;}
+
+/* ── 카드 ── */
+.mcard{background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:18px 22px;position:relative;margin-bottom:12px;}
+.mstamp{position:absolute;top:12px;right:16px;font-family:'Black Han Sans',sans-serif;font-size:10px;color:var(--accent);border:1.5px solid var(--accent);padding:2px 7px;letter-spacing:1px;transform:rotate(8deg);opacity:.85;}
+.mnum{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:5px;}
+.ttag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:2px;margin-bottom:8px;letter-spacing:1px;border:0.5px solid;}
+.ttag-상상{color:var(--gold);border-color:var(--gold);}
+.ttag-진실{color:var(--literacy);border-color:var(--literacy);}
+.ttag-리터러시{color:var(--literacy);border-color:var(--literacy);}
+.ttag-심화{color:var(--deep);border-color:var(--deep);}
+.ttag-종합{color:var(--muted);border-color:var(--muted);}
+.deep-badge{display:inline-block;background:#f3e8fe;color:var(--deep);border:0.5px solid var(--deep);font-size:11px;padding:2px 8px;border-radius:2px;margin-bottom:10px;letter-spacing:1px;}
+.mq{font-size:16px;font-weight:700;line-height:1.65;color:var(--border);padding-right:60px;margin-bottom:8px;}
+.clue-box{margin:8px 0;border:1px dashed var(--border);border-radius:3px;padding:10px 14px;background:var(--paper2);}
+.clue-lbl{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;}
+.clue-item{font-size:13px;line-height:1.85;color:var(--ink);border-left:2px solid var(--gold);padding-left:8px;margin-bottom:4px;}
+.clue-item:last-child{margin-bottom:0;}
+.clue-name{font-size:11px;color:var(--muted);margin-right:4px;}
+.ctx-box{font-size:13px;color:var(--muted);line-height:1.75;margin:8px 0;padding:8px 12px;background:var(--paper2);border-left:3px solid var(--border);white-space:pre-line;}
+.mhint{font-size:12px;color:var(--muted);margin-top:8px;padding:6px 10px;background:#fffbe6;border-left:3px solid var(--gold);display:none;}
+.mhint.show{display:block;}
+.opts-single{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.opt-btn{background:var(--paper);border:1px solid var(--border);border-radius:3px;padding:11px 13px;font-family:'Noto Serif KR',serif;font-size:13px;color:var(--ink);cursor:pointer;text-align:left;line-height:1.55;transition:background .12s;}
+.opt-btn:hover:not(:disabled){background:var(--paper2);border-color:var(--gold);}
+.opt-btn.correct{background:#e8f5e8;border-color:var(--success);color:var(--success);font-weight:700;}
+.opt-btn.wrong{background:#f5e8e8;border-color:var(--fail);color:var(--fail);text-decoration:line-through;}
+.opt-btn.timeout-reveal{background:#e8f5e8;border-color:var(--success);color:var(--success);font-weight:700;}
+.opt-btn:disabled{cursor:default;}
+.fb{margin-top:12px;padding:10px 14px;border-radius:3px;font-size:13px;line-height:1.75;display:none;}
+.fb.show{display:block;}
+.fb.ok{background:#e8f5e8;border-left:4px solid var(--success);color:var(--success);}
+.fb.no{background:#f5e8e8;border-left:4px solid var(--fail);color:var(--fail);}
+.fb.timeout{background:#fff3cd;border-left:4px solid var(--gold);color:#856404;}
+.btn-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center;}
+.nav-btn{font-family:'Black Han Sans',sans-serif;font-size:13px;letter-spacing:1px;padding:9px 18px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--border);transition:background .12s;}
+.nav-btn:hover{background:var(--paper2);}
+.nav-btn.primary{background:var(--border);color:var(--paper);}
+.nav-btn.primary:hover{background:var(--accent);border-color:var(--accent);}
+.hint-btn{font-family:'Noto Serif KR',serif;font-size:12px;padding:6px 12px;border-radius:3px;border:0.5px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;margin-left:auto;}
+.hint-btn:hover{background:#fffbe6;}
+.pts-pop{position:absolute;right:22px;top:12px;font-family:'Black Han Sans',sans-serif;font-size:20px;opacity:0;pointer-events:none;}
+.pts-pop.show{animation:popUp .9s forwards;}
+@keyframes popUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-36px);}}
+
+/* ── 결과 화면 ── */
+#screen-result{display:none;text-align:center;padding:16px 0;}
+.res-title{font-family:'Black Han Sans',sans-serif;font-size:30px;color:var(--border);letter-spacing:4px;margin-bottom:4px;}
+.res-rank{font-size:20px;color:var(--accent);font-weight:700;margin-bottom:12px;}
+.res-score-big{font-family:'Black Han Sans',sans-serif;font-size:56px;color:var(--border);line-height:1;margin-bottom:2px;}
+.res-score-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.res-box{margin:0 auto 14px;max-width:500px;text-align:left;font-size:13px;color:var(--muted);line-height:2;background:var(--paper);border:1.5px solid var(--border);border-radius:4px;padding:16px 20px;}
+
+/* ── 순위표 ── */
+.rank-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+.rank-table th{font-family:'Black Han Sans',sans-serif;font-size:11px;letter-spacing:1px;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--border);text-align:left;}
+.rank-table td{padding:8px;border-bottom:0.5px solid var(--paper2);vertical-align:middle;}
+.rn{font-family:'Black Han Sans',sans-serif;font-size:14px;color:var(--muted);width:36px;display:inline-block;}
+.rn.g1{color:#b8860b;} .rn.g2{color:#888;} .rn.g3{color:#a0522d;}
+.rank-me{background:#fff8ee;}
+.rs{font-family:'Black Han Sans',sans-serif;font-size:14px;color:var(--accent);text-align:right;}
+.rk{font-weight:700;color:var(--ink);}
+.rank-empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 0;}
+</style>
+</head>
+<body>
+<div id="game">
+
+  <div class="hdr"><div class="hdr-title">소요도서관 특보</div></div>
+  <div class="hdr-meta">
+    <span id="meta-date"></span>
+    <span>기자단 취재 미션 게임</span>
+    <span id="meta-issue"></span>
+  </div>
+
+  <!-- 닉네임 입력 -->
+  <div id="screen-nick">
+    <div class="nick-logo">기자단 입장</div>
+    <div class="nick-sub">닉네임을 입력하고 취재를 시작하세요!<br>같은 닉네임은 높은 점수 기록만 남아요.</div>
+    <div class="nick-input-wrap">
+      <input class="nick-input" id="nickInput" maxlength="10" placeholder="닉네임 (최대 10자)">
+      <button class="start-btn" onclick="startGame()">입장 →</button>
+    </div>
+    <div class="nick-warn" id="nickWarn"></div>
+    <div class="rank-section-title">현재 순위</div>
+    <div id="rank-preview"></div>
+  </div>
+
+  <!-- 게임 -->
+  <div id="screen-game">
+    <div class="prog-row">
+      <span class="prog-label" id="prog-label">미션 1 / 12</span>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <span class="score-badge" id="score-disp">0점</span>
+    </div>
+    <div class="player-row">
+      <span id="player-label">기자: —</span>
+      <span id="sec-disp"></span>
+    </div>
+    <div class="timer-row">
+      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%;background:rgb(0,180,60);"></div></div>
+      <span class="timer-num" id="timer-num">45</span>
+    </div>
+    <div class="mcard" id="mcard" style="position:relative;">
+      <div class="mstamp" id="mstamp"></div>
+      <div class="mnum" id="mnum"></div>
+      <div class="ttag" id="mthink"></div>
+      <div class="deep-badge" id="mdeep" style="display:none;">🔬 심화 — 특보 밖에서 찾아보세요!</div>
+      <div class="mq" id="mq"></div>
+      <div id="mctx"></div>
+      <div class="mhint" id="mhint"></div>
+      <div id="mopts"></div>
+      <div class="fb" id="mfb"></div>
+      <div class="pts-pop" id="ptsPop"></div>
+      <div class="btn-row">
+        <button class="hint-btn" id="hintBtn" onclick="useHint()">힌트 보기 (점수 절반)</button>
+        <button class="nav-btn primary" id="nextBtn" style="display:none" onclick="nextQ()">다음 미션 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="screen-result">
+    <div class="res-title">취재 완료!</div>
+    <div class="res-rank" id="res-rank"></div>
+    <div class="res-score-big" id="res-score"></div>
+    <div class="res-score-sub" id="res-sub"></div>
+    <div class="res-box" id="res-summary"></div>
+    <div class="rank-section-title" style="margin:14px 0 8px;">전체 순위</div>
+    <div class="res-box" style="padding:12px 16px;" id="rank-final"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:16px;">
+      <button class="nav-btn" onclick="goNick()">닉네임 변경</button>
+      <button class="nav-btn primary" onclick="restart()">다시 취재하기</button>
+    </div>
+  </div>
+
+</div><!-- #game -->
+
+<script>
+/* ================================================================
+   ★ 다음 호 교체 구역 ★
+   ISSUE_KEY 값을 바꾸면 순위 자동 리셋 (예: "v3호")
+   time: 제한시간(초) — 일반 45 / 심화 90
+   deep: true → 심화 배지 표시
+================================================================ */
+const ISSUE     = "제 2 호";
+const DATE      = "2026.03.23.";
+const ISSUE_KEY = "v2호";
+
+const QS = [
+  {sec:"상상",stamp:"역추론",think:"🔍 역추론",time:45,
+   q:"제2호 독자 댓글들을 단서로 제1호 상상제보 제목을 추리하세요!",
+   ctx:{type:"clues",label:"▪ 단서 — 제1호 독자 댓글",items:[
+     {name:"학생 A",text:"사회책이 탈주했다! 어젯밤 라면 냄새가 나서 일어났는데 사회책이!"},
+     {name:"학생 B",text:"가방에서 탈출해서 놀이공원에서 논다"},
+     {name:"학생 C",text:"단종실록이 사라졌어요 ㅜ^ㅜ"},
+     {name:"학생 D",text:"매일매일 도서관에서 빌린 책이 사라져요!"},
+     {name:"학생 E",text:"가방에 있는 책이 말을 하기 시작했어요!"}
+   ]},
+   opts:["도서관에 유령이 나타났다?","교과서들이 밤마다 가방을 탈출한다?","책들이 서로 싸우기 시작했다?","도서관 책이 스스로 날아다닌다?"],
+   ans:1,
+   ok:"날카로운 추리! '탈주', '탈출', '사라짐' — 모두 책이 가방을 빠져나간다는 공통 상상이에요.",
+   no:"댓글마다 반복되는 단어를 찾아보세요. 책들이 어디로 가고 있나요?",
+   hint:"'탈주', '탈출', '사라짐' — 책들이 어디를 벗어나고 있나요?"},
+
+  {sec:"상상",stamp:"연결",think:"🔗 연결",time:45,
+   q:"두 호의 상상제보에 공통으로 쓰인 표현 방법은 무엇일까요?",
+   ctx:{type:"plain",text:"제1호: 교과서들이 밤마다 가방을 탈출한다?\n제2호: 도서관에 강아지 선생님이 나타났다?!"},
+   opts:["실제 사건을 사진과 함께 보도했다","사물·동물을 사람처럼 표현하는 의인화를 사용했다","역사적 사실을 근거로 주장을 뒷받침했다","전문가 인터뷰로 신뢰성을 높였다"],
+   ans:1,
+   ok:"훌륭해요! 교과서가 탈출하고 강아지가 선생님이 되는 것, 모두 의인화예요!",
+   no:"교과서가 '탈출'하고 강아지가 '선생님'이 돼요. 이런 표현 방법을 뭐라고 할까요?",
+   hint:"사람만 할 수 있는 행동을 사물·동물이 하고 있어요."},
+
+  {sec:"리터러시",stamp:"리터러시",think:"📖 리터러시",time:45,
+   q:"다음 문장들 중 '사실'과 '의견'을 올바르게 구분한 것은?",
+   ctx:{type:"plain",text:"ⓐ 1948년 제주도에서 많은 사람들이 희생되었다.\nⓑ 이 슬픈 이야기는 소중한 역사가 되었다.\nⓒ 매년 4월 3일은 제주 4·3 희생자 추념일이다.\nⓓ 역사책은 과거로 가는 타임머신이다."},
+   opts:["ⓐⓒ는 사실, ⓑⓓ는 의견이다","ⓐⓑⓒⓓ 모두 사실이다","ⓐⓑ는 사실, ⓒⓓ는 의견이다","ⓐⓑⓒⓓ 모두 의견이다"],
+   ans:0,
+   ok:"정확해요! ⓐ·ⓒ는 확인 가능한 사실, ⓑ·ⓓ는 글쓴이의 판단·비유가 담긴 의견이에요.",
+   no:"날짜·사건처럼 확인 가능한 것이 사실, 글쓴이의 생각·비유가 의견이에요.",
+   hint:"'소중한 역사', '타임머신' — 이런 표현은 사실인가요, 의견인가요?"},
+
+  {sec:"리터러시",stamp:"리터러시",think:"📖 리터러시",time:45,
+   q:"특보가 독자에게 '포스트잇으로 제보해 달라'고 한 이유로 가장 적절한 것은?",
+   ctx:{type:"plain",text:"\"멋진 제보는 다음 호 특보에 실립니다.\""},
+   opts:["기자가 바빠서 기사를 혼자 쓸 수 없기 때문에","독자도 이야기의 주인공이 될 수 있도록 참여를 이끌기 위해서","제보 내용이 사실인지 확인하기 위해서","학교 규칙상 독자 참여가 의무이기 때문에"],
+   ans:1,
+   ok:"훌륭해요! 독자가 단순히 읽는 사람이 아니라 만드는 사람이 되도록 초대하는 참여형 미디어예요.",
+   no:"'멋진 제보는 다음 호에 실린다' — 독자가 어떤 역할을 하게 되나요?",
+   hint:"독자가 제보하면 신문에 실려요. 독자가 단순히 읽는 사람으로 끝날까요?"},
+
+  {sec:"진실",stamp:"사실확인",think:"📋 사실 확인",time:45,
+   q:"특보의 진실취재 내용을 바탕으로, 제주 4·3에 대해 올바르게 설명한 것은?",
+   ctx:{type:"plain",text:"매년 4월 3일은 제주 4·3 희생자 추념일이에요.\n1948년 제주도에서 많은 사람들이 이유도 모른 채\n다치거나 세상을 떠났어요. 어린이도, 할머니도, 평범한 이웃도요."},
+   opts:["1950년에 발생한 군사 사건이다","1948년에 어린이·할머니·평범한 이웃까지 이유도 모른 채 희생된 사건이다","1948년에 제주도 군인들이 반란을 일으킨 사건이다","일본 식민지 시대의 독립운동이다"],
+   ans:1,
+   ok:"정확해요! 1948년, 어린이도 할머니도 평범한 이웃도 이유를 모른 채 희생됐어요.",
+   no:"특보의 진실취재 코너를 다시 읽어보세요. 연도와 누가 희생됐는지 확인해 보세요.",
+   hint:"연도와 '어린이도, 할머니도, 평범한 이웃도'라는 표현을 확인해 보세요."},
+
+  {sec:"진실",stamp:"추론",think:"🔍 추론",time:45,
+   q:"'오랫동안 말하지 못했던 이야기'에서 '말하지 못했다'는 게 '몰랐다'와 어떻게 다를까요?",
+   ctx:{type:"plain",text:"\"오랫동안 말하지 못했던 이 슬픈 이야기는\n이제 우리 모두가 함께 기억해야 할 소중한 역사가 되었어요.\""},
+   opts:["둘 다 같은 뜻 — 아무도 기억하지 못했다","알면서도 말하기 어려운 상황이 있었다는 것이다","제주 방언이라 전달이 어려웠다는 뜻이다","너무 오래돼서 기억이 흐려졌다는 뜻이다"],
+   ans:1,
+   ok:"깊이 있는 생각이에요! 알면서도 말하기 어려운 상황이 오랫동안 이어졌어요.",
+   no:"알고 있는데도 말 못하는 상황은 언제일까요? 두렵거나 위험한 상황을 생각해 보세요.",
+   hint:"'말하지 못했다'와 '몰랐다'는 달라요. 알면서도 말하기 어려운 상황이 있다면?"},
+
+  {sec:"진실",stamp:"추론",think:"🔍 추론",time:45,
+   q:"발행일(3월 23일)과 추념일(4월 3일)을 연결해서 기자의 의도를 추리해 보세요.",
+   ctx:{type:"plain",text:"특보 발행일: 2026년 3월 23일\n제주 4·3 희생자 추념일: 매년 4월 3일\n두 날짜 사이: 11일"},
+   opts:["3월에 발행하다 보니 우연히 실렸다","추념일 전에 미리 알고 의미 있게 준비하도록 하려는 것이다","4월 특보에 실을 내용이 부족해서 당긴 것이다","기자가 제주도 출신이라 소개하고 싶었던 것이다"],
+   ans:1,
+   ok:"훌륭한 추론! 기자들은 중요한 날 '직전'에 미리 보도해요. 이것을 '사전 보도'라고 해요.",
+   no:"11일 간격이에요. 기자들은 중요한 날 직전에 기사를 쓸까요, 직후에 쓸까요?",
+   hint:"기자들은 독자가 중요한 날을 미리 알 수 있도록 언제 기사를 쓸까요?"},
+
+  {sec:"진실",stamp:"비판",think:"💬 비판적 사고",time:45,
+   q:"특보는 희생자를 '어린이도, 할머니도, 평범한 이웃도'라고 표현했어요. 이렇게 구체적으로 쓴 이유는?",
+   ctx:{type:"plain",text:"\"어린이도, 할머니도, 평범한 이웃도요.\""},
+   opts:["희생자의 정확한 나이·직업을 기록하기 위해","숫자보다 사람 한 명 한 명을 떠올리게 해 공감을 이끌어내기 위해","어린이와 노인만 희생됐음을 강조하기 위해","군인·정치인은 희생되지 않았음을 알리기 위해"],
+   ans:1,
+   ok:"섬세한 이해예요! 숫자보다 '어린이, 할머니, 이웃'이 훨씬 마음에 와닿아요. 독자가 공감하도록 한 좋은 글쓰기예요!",
+   no:"'3만 명 희생'이라는 숫자와 '어린이, 할머니, 이웃'이라는 표현 — 어느 쪽이 더 마음에 와닿나요?",
+   hint:"숫자 대신 이런 표현을 쓰면 독자에게 어떤 느낌을 줄 수 있을까요?"},
+
+  {sec:"심화",stamp:"심화",think:"🔬 심화",time:90,deep:true,
+   q:"제주 4·3을 국가가 공식 인정한 법률의 이름은 무엇일까요?",
+   ctx:{type:"plain",text:"특보 밖에서 찾아보세요!\n도서관 책이나 검색으로 확인할 수 있어요."},
+   opts:["제주 4·3 사건 진상규명 및 희생자 명예회복에 관한 특별법","제주도 역사 보존 및 관광 진흥에 관한 법률","한국 현대사 기억에 관한 특별법","국가 추념일 지정에 관한 일반법"],
+   ans:0,
+   ok:"훌륭한 조사예요! 2000년에 제정된 이 특별법으로 국가가 처음 이 사건을 공식 인정했어요.",
+   no:"'제주 4·3 특별법'을 검색해 보세요!",
+   hint:"법 이름에 '진상규명'과 '명예회복'이 들어가요."},
+
+  {sec:"심화",stamp:"심화",think:"🔬 심화",time:90,deep:true,
+   q:"댓글의 '단종실록' — 단종은 조선 몇 대 왕이며 어떤 이유로 역사에 남게 됐나요?",
+   ctx:{type:"plain",text:"학생 C: 단종실록이 사라졌어요 ㅜ^ㅜ\n\n특보 밖에서 찾아보세요!"},
+   opts:["5대 왕 — 세종의 아들로 훈민정음을 완성했다","6대 왕 — 어린 나이에 왕이 됐다가 숙부에게 왕위를 빼앗긴 비운의 왕이다","7대 왕 — 조선 영토를 가장 넓게 확장했다","8대 왕 — 임진왜란 때 나라를 지킨 왕이다"],
+   ans:1,
+   ok:"훌륭한 조사예요! 단종은 12세에 즉위했지만 숙부 수양대군에게 왕위를 빼앗긴 비운의 6대 왕이에요.",
+   no:"'단종'과 '수양대군'을 검색하거나 역사책을 찾아보세요!",
+   hint:"단종은 '수양대군'과 관련이 깊어요. 어린 왕과 숙부 사이에 어떤 일이 있었을까요?"},
+
+  {sec:"리터러시",stamp:"리터러시",think:"📖 리터러시",time:45,
+   q:"상상제보와 진실취재를 같은 특보에 담은 편집 의도로 가장 적절한 것은?",
+   ctx:{type:"plain",text:"상상제보: 재미있고 가벼운 상상 이야기\n진실취재: 무겁고 중요한 역사적 사실"},
+   opts:["지면이 남아서 채워 넣은 것이다","재미로 흥미를 끌고 자연스럽게 중요한 사실도 접하게 하는 편집 전략이다","두 코너가 서로 관련 없어 각각 독립적으로 읽히도록 한 것이다","독자가 무거운 내용을 읽지 않도록 가벼운 내용으로 균형을 맞춘 것이다"],
+   ans:1,
+   ok:"완벽한 미디어 이해예요! 재미로 흥미를 끌고 중요한 이야기를 자연스럽게 마주치게 하는 편집 전략이에요.",
+   no:"두 코너의 분위기를 비교해 보세요. 독자가 어떤 순서로 어떤 경험을 하게 될까요?",
+   hint:"독자가 재미있는 걸 먼저 읽고 나서 무거운 내용을 만나면 어떤 느낌일까요?"},
+
+  {sec:"종합",stamp:"종합",think:"📰 종합",time:45,
+   q:"상상제보의 '교과서 탈출'과 진실취재의 '제주 4·3'이 공통으로 전달하는 주제는?",
+   ctx:{type:"plain",text:"상상제보: 교과서들이 밤마다 가방을 탈출한다?\n진실취재: 오랫동안 말하지 못했던 이야기를 이제 함께 기억해야 한다."},
+   opts:["도서관 이용 방법과 책 관리의 중요성","이야기·기억·역사 — 말해지고 기억될 때 비로소 살아있는 것들","제주도와 교과서의 관계","학교생활과 공부의 즐거움"],
+   ans:1,
+   ok:"깊은 통찰이에요! 상상제보는 '책이 살아 움직인다'는 상상으로, 진실취재는 '기억하자'는 메시지로 — 둘 다 이야기와 기억의 힘을 말해요.",
+   no:"상상제보에서 책들이 왜 탈출하려 할까요? 진실취재에서 왜 기억이 중요할까요?",
+   hint:"'살아있다', '기억된다', '이야기된다' — 이 키워드로 두 코너를 연결해 보세요."}
+];
+/* ================================================================ */
+
+const TOTAL      = QS.length;
+const MAX_PER_Q  = 20;
+const MAX_SCORE  = TOTAL * MAX_PER_Q;
+const STORAGE_KEY = `ssd_rank_${ISSUE_KEY}`;
+
+let nickname="", cur=0, score=0, hintUsed=[], answered=[], results=[];
+let timerInterval=null, timeLeft=0, qStartTime=0;
+
+const secLabel = {상상:"상상제보",진실:"진실취재",리터러시:"리터러시",심화:"심화조사",종합:"종합판단"};
+const secColor  = {상상:"#b8860b",진실:"#185fa5",리터러시:"#185fa5",심화:"#533ab7",종합:"#5a4a30"};
+
+document.getElementById('meta-date').textContent  = DATE;
+document.getElementById('meta-issue').textContent = ISSUE;
+document.getElementById('res-sub').textContent    = `/ ${MAX_SCORE}점`;
+
+/* ── 점수 계산 ── */
+function calcPts(limitSec, elapsedSec, hinted) {
+  const r = elapsedSec / limitSec;
+  const base = r <= 1/3 ? 20 : r <= 2/3 ? 15 : 10;
+  return hinted ? Math.round(base / 2) : base;
+}
+
+/* ── localStorage 순위 ── */
+function getRanks() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveRank(nick, sc) {
+  let ranks = getRanks();
+  const idx = ranks.findIndex(r => r.nick === nick);
+  if (idx >= 0) { if (sc > ranks[idx].score) ranks[idx].score = sc; }
+  else ranks.push({nick, score: sc});
+  ranks.sort((a,b) => b.score - a.score);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(ranks)); } catch(e){}
+  return ranks;
+}
+
+function rnLabel(i) {
+  if (i===0) return '<span class="rn g1">🥇</span>';
+  if (i===1) return '<span class="rn g2">🥈</span>';
+  if (i===2) return '<span class="rn g3">🥉</span>';
+  return `<span class="rn">${i+1}위</span>`;
+}
+function buildTable(ranks, myNick) {
+  if (!ranks.length) return '<div class="rank-empty">아직 기록이 없어요. 첫 기자가 되어 보세요!</div>';
+  const top = ranks.slice(0, 10);
+  let h = '<table class="rank-table"><thead><tr><th>순위</th><th>닉네임</th><th style="text-align:right">점수</th></tr></thead><tbody>';
+  top.forEach((r,i) => {
+    const me = r.nick === myNick;
+    h += `<tr class="${me?'rank-me':''}"><td>${rnLabel(i)}</td><td class="rk">${r.nick}${me?' ★':''}</td><td class="rs">${r.score}</td></tr>`;
+  });
+  return h + '</tbody></table>';
+}
+function renderPreview() {
+  document.getElementById('rank-preview').innerHTML = buildTable(getRanks(), '');
+}
+
+/* ── 닉네임 입장 ── */
+document.getElementById('nickInput').addEventListener('keydown', e => { if (e.key==='Enter') startGame(); });
+function startGame() {
+  const val = document.getElementById('nickInput').value.trim();
+  if (!val) { document.getElementById('nickWarn').textContent = '닉네임을 입력해 주세요!'; return; }
+  nickname = val;
+  document.getElementById('nickWarn').textContent = '';
+  document.getElementById('screen-nick').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'block';
+  document.getElementById('player-label').textContent = `기자: ${nickname}`;
+  cur=0; score=0; hintUsed=[]; answered=[]; results=[];
+  render();
+}
+
+/* ── 타이머 ── */
+function startTimer(sec) {
+  clearInterval(timerInterval);
+  timeLeft = sec; qStartTime = Date.now();
+  updateTimerUI(sec, sec);
+  timerInterval = setInterval(() => {
+    timeLeft = Math.max(0, sec - Math.floor((Date.now()-qStartTime)/1000));
+    updateTimerUI(timeLeft, sec);
+    if (timeLeft <= 0) { clearInterval(timerInterval); onTimeout(); }
+  }, 100);
+}
+function stopTimer() { clearInterval(timerInterval); }
+function updateTimerUI(left, total) {
+  const pct = left / total * 100;
+  const fill = document.getElementById('timer-fill');
+  fill.style.width = pct + '%';
+  const r = pct>60 ? 0 : pct>30 ? Math.round((60-pct)/30*230) : 230;
+  const g = pct>60 ? 180 : Math.round(pct/60*180);
+  fill.style.background = `rgb(${r},${g},50)`;
+  const tn = document.getElementById('timer-num');
+  tn.textContent = left;
+  tn.style.color = left<=10 ? 'var(--fail)' : 'var(--ink)';
+}
+function onTimeout() {
+  const q = QS[cur];
+  answered[cur] = -1;
+  results[cur] = {ok:false, pts:0, sec:q.sec, timeout:true};
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled=true);
+  const ca = Array.isArray(q.ans) ? q.ans : [q.ans];
+  document.querySelectorAll('.opt-btn').forEach((btn,i) => {
+    if (ca.includes(i)) btn.className = 'opt-btn timeout-reveal';
+  });
+  const fb = document.getElementById('mfb');
+  fb.className = 'fb show timeout';
+  fb.textContent = `⏰ 시간 초과! 정답: ${q.opts[ca[0]]} — ${q.ok}`;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('hintBtn').style.display = 'none';
+}
+
+/* ── 문제 렌더 ── */
+function render() {
+  const q = QS[cur];
+  document.getElementById('prog-label').textContent = `미션 ${cur+1} / ${TOTAL}`;
+  document.getElementById('prog-fill').style.width = `${(cur/TOTAL)*100}%`;
+  document.getElementById('score-disp').textContent = `${score}점`;
+  document.getElementById('sec-disp').textContent = secLabel[q.sec];
+  document.getElementById('mstamp').textContent = q.stamp;
+  document.getElementById('mnum').textContent = `▪ 미션 ${String(cur+1).padStart(2,'0')} · ${secLabel[q.sec]}`;
+  const tt = document.getElementById('mthink');
+  tt.textContent = q.think; tt.className = `ttag ttag-${q.sec}`;
+  document.getElementById('mdeep').style.display = q.deep ? 'inline-block' : 'none';
+  document.getElementById('mq').textContent = q.q;
+
+  const ctxW = document.getElementById('mctx'); ctxW.innerHTML = '';
+  if (q.ctx) {
+    if (q.ctx.type === 'clues') {
+      const box = document.createElement('div'); box.className = 'clue-box';
+      const lbl = document.createElement('div'); lbl.className = 'clue-lbl'; lbl.textContent = q.ctx.label; box.appendChild(lbl);
+      q.ctx.items.forEach(item => {
+        const d = document.createElement('div'); d.className = 'clue-item';
+        d.innerHTML = `<span class="clue-name">${item.name}</span>${item.text}`; box.appendChild(d);
+      }); ctxW.appendChild(box);
+    } else {
+      const div = document.createElement('div'); div.className = 'ctx-box'; div.textContent = q.ctx.text; ctxW.appendChild(div);
+    }
+  }
+
+  const hint = document.getElementById('mhint');
+  hint.textContent = `힌트: ${q.hint}`;
+  hint.className = 'mhint' + (hintUsed[cur] ? ' show' : '');
+  document.getElementById('hintBtn').style.display = hintUsed[cur] ? 'none' : 'inline-block';
+  document.getElementById('mfb').className = 'fb'; document.getElementById('mfb').textContent = '';
+  document.getElementById('nextBtn').style.display = 'none';
+  renderOpts(q);
+  if (answered[cur] === undefined) startTimer(q.time);
+  else updateTimerUI(0, q.time);
+}
+
+function renderOpts(q) {
+  const wrap = document.getElementById('mopts'); wrap.innerHTML = '';
+  const isAns = answered[cur] !== undefined;
+  const labels = ['①','②','③','④'];
+  const ca = Array.isArray(q.ans) ? q.ans : [q.ans];
+  const grid = document.createElement('div'); grid.className = 'opts-single';
+  q.opts.forEach((o,i) => {
+    const btn = document.createElement('button'); btn.className = 'opt-btn';
+    btn.textContent = `${labels[i]} ${o}`;
+    if (isAns) {
+      btn.disabled = true;
+      const ma = Array.isArray(answered[cur]) ? answered[cur] : [answered[cur]];
+      if (ca.includes(i)) btn.className = 'opt-btn correct';
+      else if (ma.includes(i) && answered[cur] !== -1) btn.className = 'opt-btn wrong';
+    } else { btn.onclick = () => pick(i); }
+    grid.appendChild(btn);
+  }); wrap.appendChild(grid);
+}
+
+function pick(i) {
+  stopTimer();
+  const q = QS[cur]; answered[cur] = i;
+  const ca = Array.isArray(q.ans) ? q.ans : [q.ans];
+  const ok = ca.includes(i);
+  const elapsed = Math.floor((Date.now()-qStartTime)/1000);
+  const pts = ok ? calcPts(q.time, elapsed, hintUsed[cur]??false) : 0;
+  score += pts; results[cur] = {ok, pts, sec:q.sec};
+
+  if (ok && pts > 0) {
+    const pop = document.getElementById('ptsPop');
+    pop.textContent = `+${pts}점!`;
+    pop.style.color = pts>=20 ? 'var(--gold)' : pts>=15 ? 'var(--success)' : 'var(--accent)';
+    pop.className = 'pts-pop';
+    void pop.offsetWidth;
+    pop.className = 'pts-pop show';
+  }
+
+  const fb = document.getElementById('mfb');
+  fb.className = 'fb show ' + (ok?'ok':'no');
+  fb.textContent = (ok ? `✔ 정답! +${pts}점 (${elapsed}초) — ` : '✘ 다시 생각해봐요 — ') + (ok ? q.ok : q.no);
+  document.getElementById('score-disp').textContent = `${score}점`;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('hintBtn').style.display = 'none';
+  renderOpts(q);
+}
+
+function useHint() {
+  hintUsed[cur] = true;
+  document.getElementById('mhint').className = 'mhint show';
+  document.getElementById('hintBtn').style.display = 'none';
+}
+
+function nextQ() { cur++; if (cur>=TOTAL) showResult(); else render(); }
+
+function showResult() {
+  stopTimer();
+  document.getElementById('screen-game').style.display = 'none';
+  document.getElementById('screen-result').style.display = 'block';
+
+  const pct = score / MAX_SCORE;
+  let rank, msg;
+  if (pct>=0.9)      { rank='특종 기자 ★★★'; msg='특보를 꿰뚫는 날카로운 시각! 편집장감이에요.'; }
+  else if (pct>=0.7) { rank='정식 기자 ★★';  msg='생각하는 힘이 훌륭해요. 조금만 더 날카롭게!'; }
+  else if (pct>=0.5) { rank='수습 기자 ★';   msg='특보를 다시 꼼꼼히 읽고 도전해 보세요!'; }
+  else               { rank='견습 기자';      msg='기사를 읽을 때 "왜?"라는 질문을 달고 다녀봐요!'; }
+  document.getElementById('res-rank').textContent  = rank;
+  document.getElementById('res-score').textContent = score;
+
+  const byS = {};
+  results.forEach(r => {
+    if (!r) return;
+    if (!byS[r.sec]) byS[r.sec] = {ok:0, total:0, pts:0};
+    byS[r.sec].total++; byS[r.sec].pts += r.pts; if (r.ok) byS[r.sec].ok++;
+  });
+  const correct  = results.filter(r=>r&&r.ok).length;
+  const timeouts = results.filter(r=>r&&r.timeout).length;
+  let html = `<strong>점수:</strong> ${score} / ${MAX_SCORE} &nbsp;|&nbsp; <strong>정답:</strong> ${correct}/${TOTAL}`;
+  if (timeouts>0) html += ` &nbsp;|&nbsp; <strong>시간초과:</strong> ${timeouts}번`;
+  html += '<br><br>';
+  ['상상','진실','리터러시','심화','종합'].forEach(s => {
+    if (byS[s]) {
+      const {ok,total,pts} = byS[s];
+      html += `<span style="color:${secColor[s]};font-weight:700;">${secLabel[s]}</span> ${ok}/${total}문제 · ${pts}점<br>`;
+    }
+  });
+  html += `<br><small style="color:var(--muted);">${msg}</small>`;
+  document.getElementById('res-summary').innerHTML = html;
+
+  const ranks = saveRank(nickname, score);
+  document.getElementById('rank-final').innerHTML = buildTable(ranks, nickname);
+}
+
+function goNick() {
+  document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-nick').style.display = 'block';
+  renderPreview();
+}
+function restart() {
+  document.getElementById('screen-result').style.display = 'none';
+  document.getElementById('screen-game').style.display = 'block';
+  document.getElementById('player-label').textContent = `기자: ${nickname}`;
+  cur=0; score=0; hintUsed=[]; answered=[]; results=[];
+  render();
+}
+
+renderPreview();
+</script>
+</body>
+</html>
