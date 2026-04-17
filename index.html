@@ -209,7 +209,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'N
       <div class="card-top">
         <span class="mnum" id="mnum">MISSION 01</span>
         <span class="ttag" id="mthink"></span>
-        <span class="deep-badge" id="mdeep" style="display:none;">🔬 심화</span>
+        <span class="deep-badge" id="mdeep" style="display:none;">🔬 심화 · 최대 30점</span>
         <span class="mstamp" id="mstamp"></span>
       </div>
       <div class="mq" id="mq"></div>
@@ -219,7 +219,7 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'N
       <div class="fb" id="mfb"></div>
       <div class="pts-pop" id="ptsPop"></div>
       <div class="btn-row">
-        <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 힌트 (점수 절반)</button>
+        <button class="hint-btn" id="hintBtn" onclick="useHint()">💡 힌트 (점수 40%로 감소)</button>
         <button class="nav-btn primary" id="nextBtn" style="display:none" onclick="nextQ()">다음 미션 →</button>
       </div>
     </div>
@@ -253,155 +253,150 @@ import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/fir
    ★ Firebase 설정 — 아래 값을 본인 프로젝트 값으로 교체하세요 ★
 ================================================================ */
 const firebaseConfig = {
-  apiKey:            "AIzaSyATd3AR58ECv8pXWHYLSGXNQ1V4rEvb9hg",
-  authDomain:        "soyodosegwan.firebaseapp.com",
-  databaseURL:       "https://soyodosegwan-default-rtdb.firebaseio.com",
-  projectId:         "soyodosegwan",
-  storageBucket:     "soyodosegwan.firebasestorage.app",
-  messagingSenderId: "1005267209617",
-  appId:             "1:1005267209617:web:dc7e72ab0254416fe91e30"
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL:       "https://YOUR_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
 };
 
 /* ================================================================
    ★ 다음 호 교체 구역 ★
    ISSUE_KEY 바꾸면 순위 자동 리셋  /  time: 일반 45 · 심화 90
 ================================================================ */
-const ISSUE     = "제 3 호";
-const ISSUE_KEY = "v3호";
+const ISSUE     = "제 4 호";
+const ISSUE_KEY = "v4호";
 
 const QS = [
   // ── 상상제보 ──────────────────────────────────────────
   {sec:"상상",stamp:"역추론",think:"🔍 역추론",time:45,
-   q:"제3호 독자 댓글들을 단서로 제2호 상상제보 제목을 추리하세요!",
-   ctx:{type:"clues",label:"▪ 단서 — 제2호 독자 댓글",items:[
-     {name:"학생 A",text:"강아지 삐삐가 책을 찢어먹어요"},
-     {name:"학생 B",text:"멍멍! 멍! 멍! 멍! 멍! 멍! 멍!"},
-     {name:"학생 C",text:"강아지가 제 책을 가져갔어요"},
-     {name:"학생 D",text:"그 강아지는 사실 가나디였어요"},
-     {name:"학생 E",text:"가나디가 책을 뜯어먹어요 안돼!!"}
+   q:"제4호 독자 댓글들을 단서로 제3호 상상제보 제목을 추리하세요!",
+   ctx:{type:"clues",label:"▪ 단서 — 제3호 독자 댓글",items:[
+     {name:"학생 A",text:"책갈피"},
+     {name:"학생 B",text:"제자리 멀리뛰기"},
+     {name:"학생 C",text:"머리카락"}
    ]},
-   opts:["고양이 사서가 도서관을 차지했다?","도서관 책들한테 생일이 있다면?!","도서관에 강아지 선생님이 나타났다?!","책들이 밤마다 운동회를 한다?"],
+   opts:["지구가 도서관에 편지를 보냈다?!","도서관에 강아지 선생님이 나타났다?!","도서관 책들한테 생일이 있다면?!","책들이 밤마다 운동회를 한다?"],
    ans:2,
-   ok:"날카로운 역추론! '강아지', '멍멍', '삐삐' — 모두 강아지 선생님이 등장한 제2호 상상제보에 대한 반응이에요.",
-   no:"댓글에 반복되는 동물이 누구인지 찾아보세요. 어떤 동물이 도서관에 나타났을까요?",
-   hint:"멍멍! 뼈뼈! 가나디! — 이 단어들은 어떤 동물과 관련이 있나요?"},
+   ok:"날카로운 역추론! 책갈피·제자리 멀리뛰기·머리카락은 모두 '책에게 주고 싶은 선물' — 제3호 상상제보 '도서관 책들한테 생일이 있다면?!'에 대한 반응이에요.",
+   no:"세 댓글이 공통으로 어떤 질문에 대한 대답인지 생각해 보세요. 책에게 무언가를 줄 수 있다면?",
+   hint:"책갈피, 멀리뛰기, 머리카락 — 이것들은 책이 받고 싶어 할 '선물'일까요? 어떤 상상제보였을까요?"},
 
+  // ── 상상제보 (계속) ──────────────────────────────────
   {sec:"상상",stamp:"연결",think:"🔗 연결",time:45,
-   q:"제3호 상상제보 '도서관 책들한테 생일이 있다면?!'에서 4월 12일을 고른 이유로 가장 적절한 것은?",
-   ctx:{type:"plain",text:"4월 12일은 도서관의 날이래요!\n도서관도, 책들도 생일을 맞았어요.\n그런데 여러분, 책들도 선물을 받고 싶을까요?"},
-   opts:["4월이 봄이라 책 읽기 좋은 계절이기 때문에","실제로 4월 12일이 '도서관의 날'로 지정되어 있기 때문에","4월은 어린이날이 있는 달이기 때문에","특보 발행일에 맞춰 임의로 정한 날이기 때문에"],
+   q:"상상제보 '지구가 도서관에 편지를 보냈다?!'에서 4월 22일을 선택한 이유로 가장 적절한 것은?",
+   ctx:{type:"plain",text:"4월 22일은 지구의 날이래요!\n어젯밤 도서관 창문 틈으로 작은 편지가 날아들었어요.\n편지엔 이렇게 적혀 있었어요.\n\"안녕, 나는 지구야. 너희에게 하고 싶은 말이 있어.\""},
+   opts:["4월이 봄이라 편지 쓰기 좋은 계절이기 때문에","실제로 4월 22일이 '지구의 날'로 지정되어 있어 이야기와 연결됐기 때문에","지구 환경 문제가 학교 교과서에 나오기 때문에","특보 발행일(4월 20일)과 가장 가까운 날이기 때문에"],
    ans:1,
-   ok:"정확해요! 4월 12일은 실제 '도서관의 날'이에요. 상상 이야기에 실제 기념일을 연결한 센스 있는 기획이에요.",
-   no:"특보 본문을 다시 읽어보세요. '4월 12일은 ○○의 날이래요!'라고 직접 알려주고 있어요.",
-   hint:"특보가 직접 '4월 12일은 ○○의 날'이라고 말해주고 있어요."},
+   ok:"정확해요! 4월 22일은 실제 '지구의 날'이에요. 실제 기념일에 상상 이야기를 연결하는 것이 이 코너의 특기예요.",
+   no:"특보 본문에서 '4월 22일은 ○○의 날'이라고 직접 알려주고 있어요!",
+   hint:"특보가 직접 '4월 22일은 ○○의 날'이라고 말해주고 있어요."},
 
   // ── 리터러시 ──────────────────────────────────────────
   {sec:"리터러시",stamp:"리터러시",think:"📖 리터러시",time:45,
-   q:"특보의 두 코너(상상제보·진실취재)를 비교할 때, 두 코너가 공통으로 사용한 방식은?",
-   ctx:{type:"plain",text:"상상제보: 책에게 선물을 주고 싶은 내용을 포스트잇에 써서 알림판에 붙여주세요!\n진실취재: 노란 리본은 '기억할게요, 안전한 세상을 만들게요'라는 약속이에요."},
-   opts:["독자에게 행동을 유도해 참여를 이끌어낸다","전문가의 의견을 인용해 신뢰성을 높인다","통계와 숫자로 사실을 증명한다","사진과 그림으로 정보를 전달한다"],
+   q:"진실취재의 다음 문장들 중 '사실'과 '의견'을 올바르게 구분한 것은?",
+   ctx:{type:"plain",text:"ⓐ 매년 4월 20일은 장애인의 날이에요.\nⓑ 다르다는 건 이상한 게 아니에요.\nⓒ 우리 주변에는 몸이 불편하거나 보이는 방식이 다른 친구들이 있어요.\nⓓ 세상엔 다양한 방식으로 살아가는 사람들이 있고, 우리는 서로를 이해하고 도울 수 있어요."},
+   opts:["ⓐⓒ는 사실, ⓑⓓ는 의견이다","ⓐⓑⓒⓓ 모두 사실이다","ⓐⓑⓒ는 사실, ⓓ는 의견이다","ⓐⓑⓒⓓ 모두 의견이다"],
    ans:0,
-   ok:"훌륭해요! 상상제보는 포스트잇 제보로, 진실취재는 노란 리본으로 — 둘 다 독자가 직접 참여하도록 이끌어요.",
-   no:"상상제보는 '붙여주세요!', 진실취재는 '만들게요'라는 약속을 유도해요. 독자에게 무언가를 하도록 이끄는 방식이에요.",
-   hint:"상상제보는 포스트잇, 진실취재는 노란 리본 — 독자가 어떤 행동을 하게 되나요?"},
+   ok:"정확해요! ⓐ·ⓒ는 확인 가능한 사실, ⓑ는 가치 판단, ⓓ는 '~할 수 있다'는 글쓴이의 생각이에요.",
+   no:"날짜와 주변 상황처럼 확인 가능한 것이 사실, 글쓴이의 가치 판단이나 믿음이 의견이에요.",
+   hint:"'이상한 게 아니에요', '도울 수 있어요' — 이런 표현은 사실인가요, 의견인가요?"},
 
   {sec:"리터러시",stamp:"리터러시",think:"📖 리터러시",time:45,
-   q:"진실취재에서 '노란 리본'을 설명한 방식으로 가장 적절한 것은?",
-   ctx:{type:"plain",text:"\"노란 리본은 그 마음을 담은 약속이에요.\n기억할게요. 안전한 세상을 만들게요.\""},
-   opts:["리본의 색깔이 봄과 희망을 상징하기 때문에 선택됐다고 설명했다","사실 정보보다 감정과 약속의 언어로 의미를 전달했다","전문가 인터뷰를 통해 노란 리본의 역사를 설명했다","노란 리본의 제작 방법을 단계별로 안내했다"],
+   q:"특보가 상상제보에서 독자에게 '지구가 하고 싶은 말을 대신 완성해 달라'고 한 의도는?",
+   ctx:{type:"plain",text:"\"지구가 하고 싶은 말, 여러분이 대신 완성해주세요!\n포스트잇에 적어서 알림판에 붙여주세요!\""},
+   opts:["기자가 지구의 말을 몰라서 도움을 구한 것이다","독자가 직접 내용을 만들어 신문의 주인공이 되도록 참여를 이끈 것이다","포스트잇 제조사를 홍보하기 위한 것이다","학교 숙제와 연결하기 위한 것이다"],
    ans:1,
-   ok:"섬세한 이해예요! 기자는 '약속이에요', '기억할게요'처럼 감정과 다짐의 언어로 노란 리본의 의미를 전달했어요.",
-   no:"특보 본문에서 리본에 대해 어떤 말을 사용했나요? 숫자나 사실이 아닌 다른 언어를 찾아보세요.",
-   hint:"'약속이에요', '기억할게요' — 이런 표현은 사실 전달인가요, 감정 전달인가요?"},
+   ok:"훌륭해요! 독자가 단순히 읽는 사람이 아니라 이야기를 완성하는 주인공이 되도록 초대하는 참여형 미디어예요.",
+   no:"'여러분이 대신 완성해 주세요' — 독자가 어떤 역할을 하게 되나요?",
+   hint:"독자가 포스트잇을 쓰면 신문의 내용을 '만드는' 사람이 돼요. 단순히 읽는 사람인가요?"},
 
   // ── 진실취재 ──────────────────────────────────────────
   {sec:"진실",stamp:"사실확인",think:"📋 사실 확인",time:45,
-   q:"특보의 진실취재 내용을 바탕으로, 4월 16일에 있었던 일을 올바르게 설명한 것은?",
-   ctx:{type:"plain",text:"2014년 4월 16일 아침,\n제주로 수학여행을 떠나던 학생들을 태운 배가\n바다 위에서 기울기 시작했어요.\n304명의 사람들이 돌아오지 못했어요."},
-   opts:["2016년에 제주도 인근 해역에서 발생한 어선 침몰 사고다","2014년에 수학여행 중이던 학생들을 태운 배가 침몰해 304명이 희생된 사건이다","2014년에 태풍으로 인해 제주도 항구에서 배가 침몰한 사건이다","제주도 여행 중이던 관광객을 태운 비행기가 추락한 사건이다"],
+   q:"특보의 진실취재 내용을 바탕으로, 장애인의 날에 대해 올바르게 설명한 것은?",
+   ctx:{type:"plain",text:"매년 4월 20일은 장애인의 날이에요.\n우리 주변에는 몸이 불편하거나, 보이는 방식이 다르거나,\n듣고 말하는 방법이 다른 친구들이 있어요.\n장애인의 날은 '우리 모두 함께 살아가요'라는\n따뜻한 약속을 나누는 날이에요."},
+   opts:["매년 5월 20일, 장애인을 위한 모금 행사를 여는 날이다","매년 4월 20일, 서로 다른 우리가 함께 살아간다는 약속을 나누는 날이다","매년 4월 20일, 장애인 스포츠 경기를 개최하는 날이다","장애인 복지 시설 개관을 기념하는 날이다"],
    ans:1,
-   ok:"정확해요! 2014년 4월 16일, 수학여행 중이던 학생들을 포함해 304명이 돌아오지 못했어요.",
-   no:"특보 본문에서 연도·교통수단·인원수를 다시 확인해 보세요.",
-   hint:"연도는 2014년, 이동 수단은 배, 희생자 수는 304명이에요."},
+   ok:"정확해요! 4월 20일 장애인의 날은 '우리 모두 함께 살아가요'라는 따뜻한 약속을 나누는 날이에요.",
+   no:"특보 본문에서 날짜와 이 날의 의미를 다시 찾아보세요.",
+   hint:"날짜는 4월 20일, 이 날의 핵심은 '함께'와 '약속'이에요."},
 
   {sec:"진실",stamp:"추론",think:"🔍 추론",time:45,
-   q:"특보가 '우리와 나이가 비슷한 학생들도 많았어요'라고 쓴 이유는 무엇일까요?",
-   ctx:{type:"plain",text:"304명의 사람들이 돌아오지 못했어요.\n그중에는 우리와 나이가 비슷한 학생들도 많았어요."},
-   opts:["희생자의 나이를 정확히 기록하기 위해","같은 나이의 학생임을 알려 독자가 더 가깝게 느끼도록 공감을 유도하기 위해","학교 단체 여행의 위험성을 경고하기 위해","나이 어린 희생자가 가장 많았음을 통계적으로 보여주기 위해"],
+   q:"진실취재 제목 '우리 모두는 다르고 모두는 소중해요'에서 '다르다'와 '소중하다'를 함께 쓴 이유는?",
+   ctx:{type:"plain",text:"\"다르다는 건 이상한 게 아니에요.\n세상엔 다양한 방식으로 살아가는 사람들이 있고,\n우리는 서로를 이해하고 도울 수 있어요.\""},
+   opts:["다양성이 있어야 세상이 발전하기 때문에","'다름'이 문제가 아니라 오히려 소중한 것임을 전하기 위해","장애인과 비장애인의 차이를 구분하기 위해","소중한 사람들이 다를 수 있다는 통계를 소개하기 위해"],
    ans:1,
-   ok:"정확해요! '우리와 나이가 비슷한'이라는 표현은 먼 이야기가 아니라 나의 이야기로 느끼게 만드는 공감 전략이에요.",
-   no:"'우리와 나이가 비슷한' — 이 표현이 독자에게 어떤 느낌을 줄까요?",
-   hint:"그 학생들이 '나와 비슷한 나이'라는 걸 알면 어떤 감정이 드나요?"},
+   ok:"깊은 이해예요! '다르다'와 '소중하다'를 나란히 놓아 차이를 결함이 아닌 가치로 바라보도록 이끄는 거예요.",
+   no:"'다름'을 부정적으로 볼 때와 긍정적으로 볼 때 어떤 차이가 있을까요?",
+   hint:"'다르다'는 말 뒤에 '이상하다'가 아니라 '소중하다'를 연결하면 어떤 메시지가 전달될까요?"},
 
   {sec:"진실",stamp:"추론",think:"🔍 추론",time:45,
-   q:"특보 발행일(4월 6일)과 4월 16일 사이 10일 간격에서 기자의 의도를 추리해 보세요.",
-   ctx:{type:"plain",text:"특보 발행일: 2026년 4월 6일\n4월 16일: 세월호 참사 기억의 날\n두 날짜 사이: 10일"},
-   opts:["4월에 발행하다 보니 우연히 가까워진 것이다","4월 16일 이전에 미리 알려 독자가 기억을 준비하도록 하려는 것이다","발행 일정상 4월 초에 낼 수밖에 없었던 것이다","세월호보다 도서관의 날이 더 중요해서 앞당긴 것이다"],
+   q:"특보 발행일(4월 20일)과 장애인의 날(4월 20일)이 같아요. 기자의 의도로 가장 적절한 것은?",
+   ctx:{type:"plain",text:"특보 발행일: 2026년 4월 20일\n장애인의 날: 매년 4월 20일\n두 날짜 사이: 0일"},
+   opts:["우연히 같아진 것이다","바로 그날 발행해 독자가 하루 종일 그 의미를 생각하도록 한 것이다","4월 20일이 기사를 쓰기 편한 날이기 때문이다","다른 기사가 없어서 선택한 것이다"],
    ans:1,
-   ok:"훌륭한 추론! 중요한 날 '직전'에 보도해 독자가 미리 알고 마음으로 준비할 수 있도록 하는 것, 이것이 사전 보도의 힘이에요.",
-   no:"10일 전에 이 기사를 싣는 것이 우연일까요? 기자가 독자에게 무엇을 바랐을까요?",
-   hint:"기자들은 중요한 날 직전에 기사를 써요. 독자가 그날을 미리 알면 어떤 준비를 할 수 있을까요?"},
-
-  {sec:"진실",stamp:"비판",think:"💬 비판적 사고",time:45,
-   q:"특보는 '매년 4월 16일은 국민안전의 날'이라고 소개했어요. 이 정보가 진실취재에 포함된 이유는?",
-   ctx:{type:"plain",text:"매년 4월 16일은 국민안전의 날이에요.\n우리가 그날을 기억하는 건,\n다시는 이런 일이 일어나지 않길 바라는 마음 때문이에요."},
-   opts:["국민안전의 날이 도서관의 날과 날짜가 같기 때문에","슬픔에 머물지 않고 안전한 사회를 만들자는 방향으로 나아가게 하기 위해","안전의 날 행사를 홍보하기 위해","정부 정책을 소개하는 것이 기자의 의무이기 때문에"],
-   ans:1,
-   ok:"깊은 이해예요! 기억은 슬픔으로 끝나지 않아요. '다시는 이런 일이 없도록'이라는 다짐으로 이어지기 때문에 의미가 있어요.",
-   no:"'다시는 이런 일이 일어나지 않길 바라는 마음' — 기억이 단순한 슬픔이 아닌 무엇으로 이어지나요?",
-   hint:"기억하는 것이 슬픔에 머무는 것인지, 아니면 더 나은 미래를 만들기 위한 것인지 생각해 보세요."},
+   ok:"완벽한 추론! 발행일과 기념일을 일치시켜 독자가 특보를 읽는 바로 그날 의미를 온전히 느끼게 하는 것이에요.",
+   no:"이번에는 발행일과 기념일이 정확히 같아요. 이게 우연일까요, 의도일까요?",
+   hint:"발행일 = 기념일. 독자는 신문을 받아드는 그날 어떤 경험을 하게 될까요?"},
 
   // ── 심화 ──────────────────────────────────────────────
   {sec:"심화",stamp:"심화",think:"🔬 심화",time:90,deep:true,
-   q:"세월호 참사 이후 제정된 법률로, 진상 규명과 피해자 지원을 위해 만들어진 법의 이름은?",
+   q:"장애인의 날과 관련된 법률로, 장애인의 권리와 복지를 규정한 가장 핵심적인 법의 이름은?",
    ctx:{type:"plain",text:"특보 밖에서 찾아보세요!\n도서관 책이나 검색으로 확인할 수 있어요."},
-   opts:["4·16 세월호 참사 피해구제 및 지원 등을 위한 특별법","선박 안전 운항에 관한 법률","국민안전 재난 기본법","해양사고 피해자 보호 및 지원에 관한 법률"],
+   opts:["장애인복지법","사회보장기본법","국민건강보험법","장애인 고용촉진 및 직업재활법"],
    ans:0,
-   ok:"훌륭한 조사예요! 이 특별법은 희생자 가족들의 오랜 노력 끝에 만들어졌어요.",
-   no:"'세월호 특별법'으로 검색해 보세요! 법 이름에 '4·16'과 '피해구제'가 들어가요.",
-   hint:"법 이름에 '4·16', '세월호', '피해구제'가 모두 들어가요."},
+   ok:"훌륭한 조사예요! 장애인복지법은 장애인의 권리·복지·자립을 종합적으로 규정한 핵심 법률이에요.",
+   no:"'장애인 관련 법률'로 검색하거나 사회 관련 책을 찾아보세요!",
+   hint:"법 이름에 '장애인'과 '복지'가 들어가요."},
 
   {sec:"심화",stamp:"심화",think:"🔬 심화",time:90,deep:true,
-   q:"'도서관의 날'은 언제 제정됐고, 어떤 이유로 4월 12일로 정해졌나요?",
+   q:"'지구의 날'(4월 22일)은 언제, 어떤 계기로 처음 시작됐나요?",
    ctx:{type:"plain",text:"특보 밖에서 찾아보세요!\n도서관 책이나 검색으로 확인할 수 있어요."},
-   opts:["1994년, 최초의 공공 도서관이 문을 연 날이라서","2012년, 도서관법 개정으로 4월 12일이 법정 기념일로 지정되어서","2000년, 유네스코가 지정한 세계 책의 날에 맞춰서","1945년, 국립도서관이 처음 설립된 날을 기념해서"],
+   opts:["1990년, 유엔이 기후 협약을 맺으면서 시작됐다","1970년, 미국에서 환경 오염에 반대하는 시민 운동으로 시작됐다","2000년, 세계 각국 정상들이 환경 선언에 서명하면서 시작됐다","1945년, 제2차 세계대전 이후 자연 복원을 위해 시작됐다"],
    ans:1,
-   ok:"훌륭한 조사예요! 2012년 도서관법 개정으로 4월 12일이 공식 '도서관의 날'로 지정됐어요.",
-   no:"'도서관의 날 제정'으로 검색하거나 도서관 관련 책을 찾아보세요!",
-   hint:"'도서관법'과 '2012년'을 기억해 두세요."},
+   ok:"훌륭한 조사예요! 1970년 4월 22일, 미국에서 수백만 명이 환경 보호를 외치며 시작된 것이 지구의 날의 시작이에요.",
+   no:"'지구의 날 역사'로 검색하거나 환경 관련 책을 찾아보세요!",
+   hint:"1970년, 미국, 시민 운동 — 이 세 가지가 핵심이에요."},
 
-  // ── 리터러시(종합) ──────────────────────────────────────
+  // ── 리터러시(편집) ──────────────────────────────────────
   {sec:"리터러시",stamp:"편집",think:"📖 리터러시",time:45,
-   q:"이번 특보에 '도서관의 날'과 '세월호 기억의 날'을 함께 담은 편집 의도로 가장 적절한 것은?",
-   ctx:{type:"plain",text:"상상제보: 도서관 책들한테 생일이 있다면?! (4월 12일 도서관의 날)\n진실취재: 4월 16일, 우리가 함께 기억하는 날 (세월호 참사)"},
-   opts:["두 사건이 날짜가 가까워 편의상 한 호에 넣은 것이다","4월을 '기억하고 기념하는 달'로 구성해 독자가 축제와 추모를 함께 경험하도록 한 것이다","지면이 남아서 채워 넣은 것이다","두 코너가 서로 상관없이 각각 독립적으로 읽히도록 한 것이다"],
+   q:"특보가 '지구의 날'(상상제보)과 '장애인의 날'(진실취재)을 한 호에 담은 편집 의도로 가장 적절한 것은?",
+   ctx:{type:"plain",text:"상상제보: 지구가 도서관에 편지를 보냈다?! (4월 22일 지구의 날)\n진실취재: 4월 20일, 우리 모두는 다르고 모두는 소중해요 (장애인의 날)"},
+   opts:["두 행사가 날짜가 가까워 편의상 함께 넣은 것이다","'지구의 다양성'과 '사람의 다양성'을 연결해 다름의 소중함을 전달하는 편집 전략이다","지면이 남아서 채워 넣은 것이다","두 코너가 서로 관련 없이 각각 독립적으로 읽히도록 한 것이다"],
    ans:1,
-   ok:"완벽한 편집 이해예요! 기쁨과 슬픔, 기념과 추모 — 4월이라는 달 안에서 함께 기억하도록 구성한 것이에요.",
-   no:"4월 12일 도서관의 날(기쁨)과 4월 16일(추모)을 같은 호에 담은 게 우연일까요?",
-   hint:"4월 한 달 안에 기쁜 날과 슬픈 날이 모두 있어요. 기자는 독자에게 무엇을 경험하게 하려 했을까요?"},
+   ok:"완벽한 편집 이해예요! 지구도, 사람도 — 다양할수록 더 아름답고 강하다는 메시지를 두 코너가 함께 전달해요.",
+   no:"지구의 날과 장애인의 날의 공통 키워드를 찾아보세요. 둘 다 '다양성'과 관련이 있어요.",
+   hint:"지구의 생태 다양성과 사람의 다양성 — 두 코너가 함께 전달하는 가치가 무엇인지 생각해 보세요."},
 
   // ── 종합 ────────────────────────────────────────────────
   {sec:"종합",stamp:"종합",think:"📰 종합",time:45,
-   q:"상상제보의 '책들의 생일'과 진실취재의 '4월 16일 기억'이 공통으로 전달하는 메시지는?",
-   ctx:{type:"plain",text:"상상제보: 책들도 기억되고 생일을 맞이할 자격이 있다.\n진실취재: 우리가 기억하는 건 다시는 이런 일이 없길 바라기 때문이다."},
-   opts:["도서관을 더 자주 이용하자는 메시지","기억하고 기념하는 것이 우리를 더 나은 세상으로 이어준다는 것","4월에는 밖에 나가지 말자는 안전 경고","책 읽기와 안전 교육의 중요성"],
+   q:"상상제보의 '지구의 편지'와 진실취재의 '장애인의 날'이 공통으로 전달하는 메시지는?",
+   ctx:{type:"plain",text:"상상제보: 지구가 하고 싶은 말을 여러분이 완성해 주세요.\n진실취재: 우리 모두는 다르고, 모두는 소중해요."},
+   opts:["환경 보호와 복지 정책의 중요성","서로 다른 존재들이 함께 귀 기울이고 이해할 때 세상이 더 나아진다는 것","4월 행사 일정을 미리 알려주는 안내","도서관 책을 더 많이 읽자는 권장 메시지"],
    ans:1,
-   ok:"깊은 통찰이에요! 책의 생일을 기억하는 것도, 희생자를 기억하는 것도 — 모두 기억이 세상을 바꾼다는 믿음에서 출발해요.",
-   no:"책에게 선물을 주고 싶다는 상상, 희생자를 기억하겠다는 다짐 — 두 이야기의 공통된 힘은 무엇일까요?",
-   hint:"'기억한다'는 것이 두 코너에서 어떤 역할을 하는지 생각해 보세요."}
+   ok:"깊은 통찰이에요! 지구의 말에 귀 기울이고, 서로 다른 사람의 삶에 귀 기울이는 것 — 두 코너 모두 '함께 듣고 이해하기'를 이야기해요.",
+   no:"지구의 편지를 읽는 것, 다른 사람을 이해하는 것 — 두 행동에 공통된 자세가 있어요.",
+   hint:"'귀 기울이다', '이해하다', '함께' — 이 키워드로 두 코너를 연결해 보세요."}
 ];
 /* ================================================================ */
 
-const TOTAL=QS.length, MAX_PER_Q=20, MAX_SCORE=TOTAL*MAX_PER_Q;
+const TOTAL=QS.length;
+// 문제별 최대 배점: 심화(deep) 30점, 일반 20점
+const MAX_SCORE=QS.reduce((s,q)=>s+(q.deep?30:20),0);
 const COMBO_BONUS=[0,0,0,5,10,15,20];
+const PENALTY=-3;   // 오답 감점
+// 타임어택 5구간 배율 (0~20% / 20~40% / 40~60% / 60~80% / 80~100% 경과)
+const TIME_RATIO=[1.0, 0.85, 0.70, 0.55, 0.40];
 const DB_PATH=`ranks/${ISSUE_KEY}`;
 const secLabel={상상:"상상제보",진실:"진실취재",리터러시:"리터러시",심화:"심화조사",종합:"종합판단"};
 const secColor={상상:"#fbbf24",진실:"#60a5fa",리터러시:"#60a5fa",심화:"#a78bfa",종합:"#8fa3bc"};
 const RANKS=[
-  {min:.9,icon:"🏆",rank:"특종 기자 ★★★",msg:"특보를 꿰뚫는 날카로운 시각! 편집장감이에요.",confetti:true},
-  {min:.7,icon:"🥈",rank:"정식 기자 ★★",  msg:"생각하는 힘이 훌륭해요. 조금만 더 날카롭게!",confetti:true},
-  {min:.5,icon:"📰",rank:"수습 기자 ★",   msg:"특보를 다시 꼼꼼히 읽고 도전해 보세요!",confetti:false},
-  {min:0, icon:"✏️",rank:"견습 기자",      msg:'기사를 읽을 때 "왜?"라는 질문을 달고 다녀봐요!',confetti:false},
+  {min:230, icon:"🏆",rank:"특종 기자 ★★★",msg:"특보를 꿰뚫는 날카로운 시각! 편집장감이에요.",confetti:true},
+  {min:180, icon:"🥈",rank:"정식 기자 ★★",  msg:"생각하는 힘이 훌륭해요. 조금만 더 날카롭게!",confetti:true},
+  {min:120, icon:"📰",rank:"수습 기자 ★",   msg:"특보를 다시 꼼꼼히 읽고 도전해 보세요!",confetti:false},
+  {min:-999,icon:"✏️",rank:"견습 기자",      msg:'기사를 읽을 때 "왜?"라는 질문을 달고 다녀봐요!',confetti:false},
 ];
 
 let nick="", cur=0, score=0, combo=0, maxCombo=0;
@@ -570,7 +565,13 @@ function renderOpts(q){
   });
 }
 
-function calcPts(lim,el,hinted){const r=el/lim;const base=r<=1/3?20:r<=2/3?15:10;return hinted?Math.round(base/2):base;}
+function calcPts(q, elapsed, hinted){
+  const maxPts = q.deep ? 30 : 20;
+  const r = elapsed / q.time;
+  const tier = r < 0.2 ? 0 : r < 0.4 ? 1 : r < 0.6 ? 2 : r < 0.8 ? 3 : 4;
+  const base = Math.round(maxPts * TIME_RATIO[tier]);
+  return hinted ? Math.round(base * 0.4) : base;
+}
 
 function pick(i){
   stopTimer();
@@ -578,7 +579,7 @@ function pick(i){
   const ca=Array.isArray(q.ans)?q.ans:[q.ans];
   const ok=ca.includes(i);
   const elapsed=Math.floor((Date.now()-qStart)/1000);
-  let pts=ok?calcPts(q.time,elapsed,hintUsed[cur]??false):0;
+  let pts=ok?calcPts(q,elapsed,hintUsed[cur]??false):PENALTY;
 
   if(ok){
     combo++;maxCombo=Math.max(maxCombo,combo);
@@ -597,18 +598,24 @@ function pick(i){
     sfxNo();flashScreen(false);
   }
 
-  score+=pts;results[cur]={ok,pts,sec:q.sec};renderDots();
+  score+=pts;results[cur]={ok,pts,sec:q.sec,deep:q.deep??false,penalty:ok?0:PENALTY};renderDots();
 
   if(ok&&pts>0){
     const pop=document.getElementById('ptsPop');
+    const maxPts=q.deep?30:20;
     pop.textContent=`+${pts}`;
-    pop.style.color=pts>=20?'var(--gold)':pts>=15?'var(--green)':'var(--accent)';
+    pop.style.color=pts>=maxPts?'var(--gold)':pts>=maxPts*0.7?'var(--green)':'var(--accent)';
+    pop.className='pts-pop';void pop.offsetWidth;pop.className='pts-pop fly';
+  }else if(!ok){
+    const pop=document.getElementById('ptsPop');
+    pop.textContent=`${pts}`;
+    pop.style.color='var(--red)';
     pop.className='pts-pop';void pop.offsetWidth;pop.className='pts-pop fly';
   }
 
   const fb=document.getElementById('mfb');
   fb.className='fb show '+(ok?'ok':'no');
-  fb.textContent=(ok?`✔ 정답! +${pts}점 (${elapsed}초) — `:'✘ 다시 생각해봐요 — ')+(ok?q.ok:q.no);
+  fb.textContent=(ok?`✔ 정답! +${pts}점 (${elapsed}초) — `:`✘ 오답 ${pts}점 — `)+(ok?q.ok:q.no);
   document.getElementById('score-disp').textContent=score;
   document.getElementById('nextBtn').style.display='inline-block';
   document.getElementById('hintBtn').style.display='none';
@@ -624,21 +631,22 @@ async function showResult(){
   document.getElementById('screen-game').style.display='none';
   document.getElementById('screen-result').style.display='block';
 
-  const pct=score/MAX_SCORE;
-  const rd=RANKS.find(r=>pct>=r.min);
+  const rd=RANKS.find(r=>score>=r.min);
   document.getElementById('res-icon').textContent=rd.icon;
   document.getElementById('res-rank').textContent=rd.rank;
   document.getElementById('res-score').textContent=score;
-  document.getElementById('res-sub').textContent=`/ ${MAX_SCORE}점`;
+  document.getElementById('res-sub').textContent=`/ ${MAX_SCORE}점 (오답 -${Math.abs(PENALTY)}점)`;
   document.getElementById('res-msg').textContent=rd.msg;
   if(rd.confetti)fireConfetti();
 
   const correct=results.filter(r=>r&&r.ok).length;
   const timeouts=results.filter(r=>r&&r.timeout).length;
+  const penalties=results.filter(r=>r&&!r.ok&&!r.timeout).length;
+  const penaltyTotal=penalties*Math.abs(PENALTY);
   document.getElementById('stat-grid').innerHTML=`
     <div class="stat-item"><div class="stat-num">${correct}</div><div class="stat-lbl">정답</div></div>
     <div class="stat-item"><div class="stat-num">${maxCombo}</div><div class="stat-lbl">최고콤보</div></div>
-    <div class="stat-item"><div class="stat-num">${timeouts}</div><div class="stat-lbl">시간초과</div></div>
+    <div class="stat-item"><div class="stat-num" style="color:${penaltyTotal>0?'var(--red)':'var(--text)'}">-${penaltyTotal}</div><div class="stat-lbl">오답감점</div></div>
   `;
 
   const byS={};
